@@ -5,9 +5,13 @@
 package it.polito.tdp.rivers;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.rivers.model.Flow;
 import it.polito.tdp.rivers.model.Model;
+import it.polito.tdp.rivers.model.River;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -25,7 +29,7 @@ public class FXMLController {
     private URL location;
 
     @FXML // fx:id="boxRiver"
-    private ComboBox<?> boxRiver; // Value injected by FXMLLoader
+    private ComboBox<River> boxRiver; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtStartDate"
     private TextField txtStartDate; // Value injected by FXMLLoader
@@ -47,6 +51,29 @@ public class FXMLController {
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
+    
+    @FXML
+    void doScegli(ActionEvent event) {
+    	if (this.boxRiver.getValue()==null) {
+    		System.out.println("ERRORE!!!");
+    		return;
+    	}
+    	River temp = this.boxRiver.getValue();
+    	this.model.LoadMisurazioni(temp);
+    	if (this.model.getMisurazioniFiume().size()==0)
+    		System.out.println("ERRORE");
+    	LocalDate primaData = this.model.getPrimaMisurazione().getDay();
+    	if (primaData != null)
+    		this.txtStartDate.setText(primaData.toString());
+    	LocalDate ultimaData = this.model.getUltimaMisurazione().getDay();
+    	if (ultimaData != null)
+    		this.txtEndDate.setText(ultimaData.toString());
+    	double mediaMisurazioni = this.model.getMediaMisurazioni();
+    	this.txtFMed.setText(String.valueOf(mediaMisurazioni));
+    	int numeroMisurazioni = this.model.getNumeroMisurazioni();
+    	this.txtNumMeasurements.setText(String.valueOf(numeroMisurazioni));
+    //	System.out.println(this.model.getMisurazioniFiume().get(0));
+    }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -62,5 +89,6 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	this.boxRiver.getItems().addAll(this.model.getAllRiversList());
     }
 }
